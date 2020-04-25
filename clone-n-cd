@@ -1,0 +1,16 @@
+# Source this file
+
+clone-n-cd() {
+	tmp=$(mktemp)
+	# |& - git outputs to stderr -_-
+	# --progress - git goes silent if stderr is not attached to a terminal -_-
+	git clone "$@" --progress |& tee $tmp
+	first_line=$(head -n 1 "$tmp")
+	rm $tmp
+	dir=$(echo $first_line | sed -E "s/.*'(.*)'.*/\1/")
+	if [[ "$first_line" != "$dir" ]]; then
+		cd $dir
+	else
+		echo "Couldn't extract directory"
+	fi
+}
